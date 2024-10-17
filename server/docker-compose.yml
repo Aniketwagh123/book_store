@@ -1,0 +1,51 @@
+version: "3"
+services:
+  bookstore_db:
+    container_name: bookstore_db
+    image: postgres:13
+    networks:
+      - bookstore_network
+    volumes:
+      - bookstore_postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+  bookstore_web:
+    container_name: bookstore_web
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_NAME=${POSTGRES_DB}
+      - DATABASE_USER=${POSTGRES_USER}
+      - DATABASE_PASSWORD=${POSTGRES_PASSWORD}
+      - DATABASE_HOST=bookstore_db  # Reference the database service by its container name
+    depends_on:
+      - bookstore_db  # Ensure the web service waits for the db to be ready
+    networks:
+      - bookstore_network
+
+  bookstore_pgadmin:
+    container_name: bookstore_pgadmin
+    image: dpage/pgadmin4:latest
+    networks:
+      - bookstore_network
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    volumes:
+      - bookstore_pgadmin_data:/var/lib/pgadmin
+
+volumes:
+  bookstore_postgres_data:
+  bookstore_pgadmin_data:
+
+networks:
+  bookstore_network:
