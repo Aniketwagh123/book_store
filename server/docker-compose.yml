@@ -1,19 +1,19 @@
 version: "3"
 services:
-  bookstore_db:
-    container_name: bookstore_db
+  db:
+    container_name: db
     image: postgres:13
     networks:
-      - bookstore_network
+      - mynetwork
     volumes:
-      - bookstore_postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
-  bookstore_web:
-    container_name: bookstore_web
+  web:
+    container_name: web
     build: .
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
@@ -24,28 +24,62 @@ services:
       - DATABASE_NAME=${POSTGRES_DB}
       - DATABASE_USER=${POSTGRES_USER}
       - DATABASE_PASSWORD=${POSTGRES_PASSWORD}
-      - DATABASE_HOST=bookstore_db  # Reference the database service by its container name
+      - DATABASE_HOST=db
     depends_on:
-      - bookstore_db  # Ensure the web service waits for the db to be ready
+      - db
     networks:
-      - bookstore_network
+      - mynetwork
 
-  bookstore_pgadmin:
-    container_name: bookstore_pgadmin
+  pgadmin:
+    container_name: pgadmin
     image: dpage/pgadmin4:latest
     networks:
-      - bookstore_network
+      - mynetwork
     ports:
       - "5050:80"
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+      PGADMIN_CONFIG_ENHANCED_SECURITY: "False"
     volumes:
-      - bookstore_pgadmin_data:/var/lib/pgadmin
+      - pgadmin_data:/var/lib/pgadmin
+
+  redis:
+    container_name: redis
+    image: redis:alpine
+    ports:
+      - "6379:6379"  # Changed the host port to avoid conflicts
+    networks:
+      - mynetwork
+
+  celery:
+    container_name: celery
+    build: .
+    command: celery -A book_store worker -l info
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+      - web
+    networks:
+      - mynetwork
+
+  celery_beat:
+    build: .
+    container_name: celery_beat
+    command: celery -A book_store beat --loglevel=info
+    restart: always
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+      - redis
+    networks:
+      - mynetwork
 
 volumes:
-  bookstore_postgres_data:
-  bookstore_pgadmin_data:
+  postgres_data:
+  pgadmin_data:
 
 networks:
-  bookstore_network:
+  mynetwork:

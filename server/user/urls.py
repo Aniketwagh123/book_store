@@ -1,8 +1,9 @@
+from django.urls import path
+from .views import RegisterUserView, LoginUserView, verify_registered_user
 
-from django.http import HttpResponse
-from django.urls import include, path
-def hi(request):
-    return HttpResponse("hii")
 urlpatterns = [
-    path('hi/', hi),
+    path('register/', RegisterUserView.as_view(), name='register_user'),
+    path('login/', LoginUserView.as_view(), name='login_user'),
+    path('verify/<str:token>', verify_registered_user, name='verify_email'),
 ]
+ 
