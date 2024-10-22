@@ -33,19 +33,19 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 AUTH_USER_MODEL = 'user.User'
-# CORS_ALLOWED_ORIGINS = [
-#     'http://localhost:5173',
-#       # Your frontend's origin
-# ]
-# CSRF_TRUSTED_ORIGINS = [
-#     'http://localhost:5173',
-#     # Add other trusted origins if needed
-# ]
-# SESSION_COOKIE_SAMESITE = "None"
-# CSRF_COOKIE_SAMESITE = "None"
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:5173',
+      # Your frontend's origin
+]
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:5173',
+    # Add other trusted origins if needed
+]
+SESSION_COOKIE_SAMESITE = "None"
+CSRF_COOKIE_SAMESITE = "None"
 
 
-# Application definition
+# Application definition]=o
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -57,9 +57,10 @@ INSTALLED_APPS = [
     'user',
     'django_celery_beat',
     'drf_yasg',
-    # 'corsheaders',
+    'corsheaders',
     'book',
     'cart',
+    'order',
 ]
 
 MIDDLEWARE = [
@@ -70,7 +71,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # 'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'book_store.urls'

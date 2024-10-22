@@ -41,5 +41,6 @@ urlpatterns = [
          cache_timeout=0), name='schema-swagger-ui'),
     path('api/book/', include('book.urls')),
     path('api/cart/', include('cart.urls')),
+    path('api/order/', include('order.urls')),
 
 ]
