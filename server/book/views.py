@@ -16,7 +16,8 @@ from loguru import logger
 class BookViewSet(viewsets.ModelViewSet):
     """
     A ViewSet for performing CRUD operations on books with proper permissions.
-    Sellers and superusers can create, update, or delete.
+    
+    Sellers and superusers can create, update, or delete books.
     Any authenticated user can retrieve books.
     """
     authentication_classes = [JWTAuthentication]
@@ -47,7 +48,6 @@ class BookViewSet(viewsets.ModelViewSet):
     )
     def create(self, request, *args, **kwargs):
         """Handle the creation of a new book."""
-        logger.info('ssssssssss')
         try:
             data = request.data.copy()
             data['user'] = request.user.id

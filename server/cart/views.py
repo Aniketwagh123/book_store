@@ -45,12 +45,6 @@ class CartView(APIView):
         """
         try:
             cart = self.get_cart(request.user)
-            if cart is None:
-                return Response({
-                    "message": "Failed to retrieve cart.",
-                    "status": "error",
-                    "error": "Unable to fetch cart details."
-                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
             serializer = CartSerializer(cart)
             return Response({
@@ -124,23 +118,13 @@ class CartItemView(APIView):
         """
         try:
             cart = self.get_cart(request.user)
-            if cart is None:
-                return Response({
-                    "message": "Failed to retrieve cart.",
-                    "status": "error",
-                    "error": "Unable to fetch cart details."
-                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
             quantity = request.data.get('quantity', 0)
-
-            if quantity <= 0:
-                raise ValidationError(
-                    {"error": "Quantity must be greater than zero."})
 
             data = {
                 'cart': cart.id,  # type: ignore
                 'book': book_id,
-                'quantity': quantity,
+                'quantity': quantity, 
             }
 
             serializer = CartItemSerializer(data=data)
