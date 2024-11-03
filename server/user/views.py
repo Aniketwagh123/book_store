@@ -1,3 +1,4 @@
+from rest_framework.exceptions import NotFound, ValidationError
 from .serializers import LoginSerializer
 from django.urls import reverse
 from rest_framework.views import APIView
@@ -19,6 +20,8 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework import serializers
 from django.conf import settings
 from loguru import logger
+from rest_framework.permissions import IsAuthenticated
+
 
 
 class RegisterUserView(APIView):
@@ -99,9 +102,9 @@ class LoginUserView(APIView):
                     'message': 'User login successful',
                     'status': 'success',
                     # Include user data # type: ignore
-                    'data': response_data['data'], # type: ignore
+                    'data': response_data['data'],  # type: ignore
                     # Include tokens # type: ignore
-                    'tokens': response_data['tokens'] # type: ignore
+                    'tokens': response_data['tokens']  # type: ignore
                 }
                 return Response(response, status=status.HTTP_200_OK)
 
@@ -123,9 +126,6 @@ class LoginUserView(APIView):
                 'status': 'error',
                 'error': str(e)
             }, status=status.HTTP_400_BAD_REQUEST)
-
-from rest_framework.exceptions import NotFound, ValidationError
-
 
 
 @api_view(['GET'])
@@ -151,3 +151,38 @@ def verify_registered_user(request, token: str):
 
     except Exception as e:
         return Response({'message': 'An unexpected error occurred during verification', 'status': 'error', 'errors': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class UserInfoView(APIView):
+    """
+    Retrieves user information for the authenticated user.
+    """
+
+    permission_classes = [IsAuthenticated]  # Require authentication
+
+    def get(self, request, *args, **kwargs):
+        try:
+            user = request.user  # Directly access the authenticated user
+
+            user_data = {
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'is_verified': getattr(user, 'is_verified', False)  # Handle if is_verified doesn't exist
+            }
+
+            return Response({
+                'message': 'User info retrieved successfully',
+                'status': 'success',
+                'data': user_data
+            }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            logger.exception("An unexpected error occurred: %s", str(e))
+            return Response({
+                'message': 'An unexpected error occurred',
+                'status': 'error',
+                'errors': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

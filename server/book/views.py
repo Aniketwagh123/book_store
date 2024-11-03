@@ -11,19 +11,28 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from loguru import logger
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 
 class BookViewSet(viewsets.ModelViewSet):
     """
     A ViewSet for performing CRUD operations on books with proper permissions.
-    
+
     Sellers and superusers can create, update, or delete books.
     Any authenticated user can retrieve books.
     """
     authentication_classes = [JWTAuthentication]
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    permission_classes = [IsSellerOrReadOnly, IsOwnerOrSuperuser]
+    permission_classes = [IsAuthenticated,
+        IsSellerOrReadOnly, IsOwnerOrSuperuser]
+
+
+    def get_permissions(self):
+            """Override to set custom permissions for list and retrieve actions."""
+            if self.action in ['list', 'retrieve']:
+                return [AllowAny()]  # Allow any user to list or retrieve books
+            return super().get_permissions()  # Default permissions for other actions
 
     @swagger_auto_schema(
         manual_parameters=[

@@ -5,7 +5,7 @@ from loguru import logger
 class BookSerializer(serializers.ModelSerializer):
     class Meta:
         model = Book
-        fields = ['id', 'name', 'author', 'description', 'user', 'price', 'stock', 'publish_date']
+        fields = ['id', 'name', 'author', 'description', 'user', 'price', 'stock', 'publish_date', 'imgSrc']
 
     # def create(self, validated_data):
     #     """

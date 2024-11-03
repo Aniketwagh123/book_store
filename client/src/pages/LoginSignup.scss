@@ -1,0 +1,97 @@
+.login-container {
+  width: 350px;
+  height: 350px;
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  background-color: #f4f4f4;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.logo-container {
+  width: 100%;
+  text-align: center;
+}
+
+.logo-container img {
+  width: 70%;
+  height: auto;
+  border-radius: 50%;
+}
+
+.form-container {
+  background-color: white;
+  // padding-right: "200px";
+  // width: 900%;
+  width: 350px;
+  height: 350px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 50px;
+  margin-right: -400px;
+}
+
+.form-header {
+  display: flex;
+  justify-content: space-between;
+  // align-items: center;
+  margin-bottom: 20px;
+}
+
+h2 {
+  font-size: 1.6em;
+  cursor: pointer;
+  color: #333;
+}
+
+h2:hover {
+  color: maroon;
+}
+
+.login-form-body {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  text-align: left;
+  color: #555;
+  margin-bottom: 2px;
+  margin-top: 10px;
+}
+
+// .MuiTextField-root {
+//   width: 80%;
+//   margin-bottom: 20px;
+// }
+
+.login-form-footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px 0;
+}
+
+.footer-button {
+  display: flex;
+  justify-content: space-between;
+}
+
+// .footer-button div {
+//   width: 48%;
+//   height: 2.5em;
+//   text-align: center;
+//   padding-top: 1.6%;
+//   color: white;
+//   cursor: pointer;
+//   border-radius: 4px;
+// }
+
+// .footer-button div:first-child {
+//   background-color: #4266B2;
+// }
+
+// .footer-button div:last-child {
+//   background-color: #db4437;
+// }

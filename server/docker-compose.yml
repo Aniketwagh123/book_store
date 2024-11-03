@@ -44,13 +44,13 @@ services:
     volumes:
       - pgadmin_data:/var/lib/pgadmin
 
-  redis:
-    container_name: redis
-    image: redis:alpine
-    ports:
-      - "6379:6379"  # Changed the host port to avoid conflicts
-    networks:
-      - mynetwork
+  # redis:
+  #   container_name: redis
+  #   image: redis:alpine
+  #   ports:
+  #     - "6379:6379"  # Changed the host port to avoid conflicts
+  #   networks:
+  #     - mynetwork
 
   celery:
     container_name: celery
@@ -59,7 +59,7 @@ services:
     volumes:
       - .:/app
     depends_on:
-      - redis
+      # - redis
       - web
     networks:
       - mynetwork
@@ -73,7 +73,7 @@ services:
       - .:/app
     depends_on:
       - db
-      - redis
+      # - redis
     networks:
       - mynetwork
 

@@ -9,6 +9,7 @@ class Book(models.Model):
     price = models.PositiveIntegerField()
     publish_date = models.DateField()  # New field for book's publish date
     stock = models.PositiveIntegerField(default=0)  # New field for stock count
+    imgSrc = models.CharField(max_length=500, default="")
 
     def __str__(self):
         return self.name
