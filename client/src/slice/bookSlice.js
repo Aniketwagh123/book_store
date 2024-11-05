@@ -23,10 +23,26 @@ const bookSlice = createSlice({
   name: "books",
   initialState: {
     items: [],
+    filteredItems: [],
+    search: false,
     loading: false,
     error: null,
   },
-  reducers: {},
+  reducers: {
+    filterBooks: (state, action) => {
+      const searchTerm = action.payload.toLowerCase();
+      state.search = searchTerm.length > 0; // Update search state
+      state.filteredItems = state.items.filter(
+        (book) =>
+          book.name.toLowerCase().includes(searchTerm) ||
+          book.author.toLowerCase().includes(searchTerm)
+      );
+    },
+    clearSearch: (state) => {
+      state.search = false; // Reset search state
+      state.filteredItems = []; // Optionally clear the filtered items
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(initializeBooks.pending, (state) => {
@@ -61,3 +77,4 @@ export const selectBooksByIds = (state, ids) =>
   state.books.items.filter((book) => ids.includes(book.id));
 
 export default bookSlice.reducer;
+export const { filterBooks, clearSearch } = bookSlice.actions; // Export the clearSearch action

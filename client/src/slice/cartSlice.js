@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import cartService from "../services/cartService";
 
-
 // Async thunk for fetching the cart
 export const fetchCart = createAsyncThunk("cart/fetchCart", async () => {
   const response = await cartService.fetchCart();
@@ -31,8 +30,6 @@ export const updateItemQuantity = createAsyncThunk(
   "cart/updateItemQuantity",
   async ({ id, quantity }) => {
     const response = await cartService.updateItemQuantity(id, quantity);
-    // console.log(response.data);
-
     return response.data;
   }
 );
@@ -102,7 +99,7 @@ const cartSlice = createSlice({
       .addCase(updateItemQuantity.fulfilled, (state, action) => {
         const { book, quantity } = action.payload; // Ensure payload structure is correct
         const existingItem = state.items.find((i) => i.book === book);
-        console.log(action.payload);
+        console.log("++++", existingItem);
 
         if (existingItem) {
           const previousQuantity = existingItem.quantity;
@@ -113,6 +110,7 @@ const cartSlice = createSlice({
           state.totalPrice +=
             quantity * existingItem.price -
             previousQuantity * existingItem.price;
+          console.log("lll", { 1: state.totalQuantity, 2: state.totalPrice });
         }
       })
       .addCase(removeItem.fulfilled, (state, action) => {

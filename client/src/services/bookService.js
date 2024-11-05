@@ -8,20 +8,20 @@ const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
 });
 
-// Add a request interceptor to include the Authorization header
-axiosInstance.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("accessToken");
-    // If the token exists, set the Authorization header
-    if (token) {
-      config.headers["Authorization"] = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
+// // Add a request interceptor to include the Authorization header
+// axiosInstance.interceptors.request.use(
+//   (config) => {
+//     const token = localStorage.getItem("accessToken");
+//     // If the token exists, set the Authorization header
+//     if (token) {
+//       config.headers["Authorization"] = `Bearer ${token}`;
+//     }
+//     return config;
+//   },
+//   (error) => {
+//     return Promise.reject(error);
+//   }
+// );
 
 // Define the book service functions
 export const bookService = {

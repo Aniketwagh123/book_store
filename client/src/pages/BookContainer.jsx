@@ -6,6 +6,9 @@ import { useSelector } from "react-redux";
 
 const BookContainer = () => {
   const books = useSelector((state) => state.books.items); // Access the books from the Redux store
+  const search = useSelector((state) => state.books.search);
+  const filteredItems = useSelector((state) => state.books.filteredItems);
+  
   const [sort, setSort] = React.useState("");
   const [currentPage, setCurrentPage] = React.useState(1);
   const itemsPerPage = 12; // Number of books per page
@@ -15,7 +18,7 @@ const BookContainer = () => {
   };
 
   // Sort books based on the selected criteria
-  const sortedBooks = [...books].sort((a, b) => {
+  const sortedBooks = [...(search ? filteredItems : books)].sort((a, b) => {
     switch (sort) {
       case "price-asc":
         return a.price - b.price; // Sort by price ascending
@@ -51,7 +54,7 @@ const BookContainer = () => {
         }}
       >
         <Typography variant="h5" gutterBottom>
-          Books ({books.length} Items)
+          Books ({search ? filteredItems.length : books.length} Items)
         </Typography>
         <SortBar sort={sort} handleSortChange={handleSortChange} />
       </div>

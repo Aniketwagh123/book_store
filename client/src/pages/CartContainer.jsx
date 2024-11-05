@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
   Button,
@@ -20,16 +20,17 @@ import {
 } from "@mui/material";
 import { ArrowDropDown, ArrowRight } from "@mui/icons-material";
 import { selectBooksByIds } from "../slice/bookSlice"; // Adjust path as necessary
-import { removeItem, updateItemQuantity } from "../slice/cartSlice"; // Adjust path as necessary
+import { addItem, removeItem, updateItemQuantity } from "../slice/cartSlice"; // Adjust path as necessary
 import { addAddress } from "../slice/addressSlice"; // Adjust path as necessary
 import { useNavigate } from "react-router-dom"; // Import useNavigate
+import LoginModal from "../components/LoginModal";
 
 const CartContainer = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate(); // Initialize navigate
 
   const cartItems = useSelector((state) => state.cart.items);
-  const bookIds = cartItems.map((item) => item.book);
+  const bookIds = cartItems.map((item) => parseInt(item.book, 10));
   const booksInCart = useSelector((state) => selectBooksByIds(state, bookIds));
   const addresses = useSelector((state) => state.address.addresses); // Get addresses from state
 
@@ -65,9 +66,52 @@ const CartContainer = () => {
     dispatch(removeItem(bookId));
   };
 
+  const { user } = useSelector((state) => state.auth); // Access user from auth state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [localStorageCartItems, setLocalStorageCartItems] = useState([]);
+
+  useEffect(() => {
+    const storedCartItems = JSON.parse(localStorage.getItem("cart")) || [];
+
+    if (user && storedCartItems) {
+      // console.log("Current cart items:", cartItems);
+      // console.log("Stored items in localStorage:", storedCartItems);
+
+      // const newItemsInLocalStorage = storedCartItems.filter(
+      //   (storedItem) =>
+      //     !cartItems.some((cartItem) => cartItem.book === storedItem.book)
+      // );
+
+      // // Log the new items found in localStorage that are not in cartItems
+      // console.log("New items in localStorage that are not in cartItems:", newItemsInLocalStorage);
+
+      // Dispatch addItem for each new item and remove it from localStorage
+      storedCartItems.forEach((item) => {
+        dispatch(addItem({ book: item.book, quantity: item.quantity }));
+      });
+
+      localStorage.setItem("cart", JSON.stringify([]));
+    }
+  }, [user]);
+
+
   const handlePlaceOrder = () => {
-    setShowAddressSelection(true);
-    setIsAddressOpen(true);
+    if (!user) {
+      // If user is not logged in, show login modal
+      const storedCartItems = JSON.parse(localStorage.getItem("cart")) || [];
+      setLocalStorageCartItems(storedCartItems);
+
+      setIsModalOpen(true);
+    } else {
+      // If user is logged in, proceed with address selection
+      setShowAddressSelection(true);
+      setIsAddressOpen(true);
+    }
+  };
+  const handleLoginModalClose = () => {
+    console.log("___", cartItems);
+
+    setIsModalOpen(false);
   };
 
   const handleContinue = () => {
@@ -78,7 +122,6 @@ const CartContainer = () => {
       alert("Please select or enter an address.");
     }
   };
-  
 
   const handleAddAddress = () => {
     if (
@@ -104,11 +147,12 @@ const CartContainer = () => {
 
   const handleCheckout = () => {
     setIsOrderSummaryOpen(false);
-    navigate("/orderplacesuccess"); 
+    navigate("/orderplacesuccess");
   };
 
   return (
     <div style={{ width: "80%", margin: "auto", marginBlock: "45px" }}>
+      {/* {JSON.stringify(cartItems)} */}
       <div
         style={{
           border: "1px solid black",
@@ -119,7 +163,13 @@ const CartContainer = () => {
       >
         <Typography variant="h5">My Cart ({bookIds.length} items)</Typography>
         {cartItems.map((item) => {
-          const book = booksInCart.find((b) => b.id === item.book);
+          const book = booksInCart.find(
+            (b) => b.id === parseInt(item.book, 10)
+          );
+          // console.log("booksInCart");
+          // console.log(booksInCart);
+          // console.log(item);
+
           return (
             <div
               key={item.book}
@@ -337,6 +387,17 @@ const CartContainer = () => {
           </Box>
         </Collapse>
       </Box>
+      <LoginModal
+        open={isModalOpen}
+        handleClose={handleLoginModalClose}
+        onLoginSuccess={() => {
+          console.log("localStorageCartItems");
+          console.log(localStorageCartItems);
+          console.log("cartItems");
+          console.log(cartItems);
+          handleLoginModalClose();
+        }}
+      />
     </div>
   );
 };

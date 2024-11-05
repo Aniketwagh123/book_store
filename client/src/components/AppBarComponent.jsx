@@ -9,9 +9,11 @@ import {
   Menu,
   MenuItem,
   Tooltip,
+  Button, // Import Button for clear action
 } from "@mui/material";
 import {
   Search as SearchIcon,
+  Close as CloseIcon, // Import the Close icon
   AccountCircle,
   ShoppingCart,
   Assignment as OrdersIcon,
@@ -22,7 +24,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { useState } from "react";
 import LoginModal from "./LoginModal";
-import { logout } from "../slice/authSlice";
+import { fetchUserInfo, logout } from "../slice/authSlice";
+import { fetchCart } from "../slice/cartSlice";
+import { initializeBooks, filterBooks, clearSearch } from "../slice/bookSlice"; // Import clearSearch action
 
 // Search bar styling
 const Search = styled("div")(({ theme }) => ({
@@ -73,7 +77,6 @@ const AppBarComponent = () => {
   const { user } = useSelector((state) => state.auth);
   const [anchorEl, setAnchorEl] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   const isMenuOpen = Boolean(anchorEl);
 
   const handleProfileMenuOpen = (event) => {
@@ -95,6 +98,9 @@ const AppBarComponent = () => {
 
   const handleLogout = () => {
     dispatch(logout());
+    dispatch(fetchCart());
+    dispatch(initializeBooks());
+    dispatch(fetchUserInfo());
     handleMenuClose();
   };
 
@@ -105,6 +111,19 @@ const AppBarComponent = () => {
       navigate(path);
       handleMenuClose();
     }
+  };
+
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    dispatch(filterBooks(value)); // Dispatch the action to filter books
+  };
+
+  const handleClearSearch = () => {
+    setSearchTerm("");
+    dispatch(clearSearch()); // Dispatch the action to clear search
   };
 
   return (
@@ -124,7 +143,16 @@ const AppBarComponent = () => {
             <SearchIconWrapper>
               <SearchIcon />
             </SearchIconWrapper>
-            <StyledInputBase placeholder="Search…" />
+            <StyledInputBase
+              placeholder="Search by Title or Author…"
+              value={searchTerm}
+              onChange={handleSearchChange}
+            />
+            {searchTerm && ( // Only show the clear button if there's a search term
+              <IconButton onClick={handleClearSearch} sx={{ p: 1 }}>
+                <CloseIcon />
+              </IconButton>
+            )}
           </Search>
 
           <div>
@@ -142,8 +170,6 @@ const AppBarComponent = () => {
             >
               {user ? (
                 <>
-                  {" "}
-                  {/* You can also use <></> here, but MUI prefers direct elements */}
                   <MenuItem onClick={handleMenuClose}>
                     Hello, {user.username}
                   </MenuItem>
@@ -161,32 +187,28 @@ const AppBarComponent = () => {
                   My Orders
                 </MenuItem>
               </Tooltip>
-              <Tooltip title="Wishlist" arrow>
-                <MenuItem onClick={() => handleNavigate("/wishlist")}>
+              <Tooltip title="My Wishlist" arrow>
+                <MenuItem onClick={() => handleNavigate("/my-wishlist")}>
                   <WishlistIcon style={{ marginRight: 8 }} />
-                  Wishlist
+                  My Wishlist
                 </MenuItem>
               </Tooltip>
+              <Tooltip title="My Cart" arrow>
+                <IconButton
+                  size="large"
+                  color="inherit"
+                  onClick={() => handleNavigate("/my-cart")}
+                >
+                  <Badge badgeContent={cartItemsCount} color="error">
+                    <ShoppingCart />
+                  </Badge>
+                </IconButton>
+              </Tooltip>
             </Menu>
-
-            <Link to={"/cart"}>
-              <IconButton size="large" color="inherit">
-                <Badge badgeContent={cartItemsCount} color="error">
-                  <ShoppingCart sx={{ color: "white" }} />
-                </Badge>
-              </IconButton>
-            </Link>
           </div>
         </Toolbar>
       </AppBar>
-      <LoginModal
-        open={isModalOpen}
-        handleClose={handleLoginModalClose}
-        onLoginSuccess={() => {
-          handleLoginModalClose();
-          handleMenuClose();
-        }}
-      />
+      <LoginModal open={isModalOpen} onClose={handleLoginModalClose} />
     </Container>
   );
 };

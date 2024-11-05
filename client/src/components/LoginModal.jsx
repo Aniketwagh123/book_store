@@ -2,9 +2,11 @@ import { useState } from "react";
 import PropTypes from "prop-types";
 import { Modal, Box, TextField, Button } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { loginUser } from "../slice/authSlice"; // Import the loginUser thunk
+import { fetchUserInfo, loginUser } from "../slice/authSlice"; // Import the loginUser thunk
 import "../pages/LoginSignup.scss";
 import logo from "../assets/images/logo.png";
+import { initializeBooks } from "../slice/bookSlice";
+import { fetchCart } from "../slice/cartSlice";
 
 const modalStyle = {
   position: "absolute",
@@ -28,7 +30,11 @@ const LoginModal = ({ open, handleClose, onLoginSuccess }) => {
   const handleLogin = async () => {
     const result = await dispatch(loginUser({ email, password }));
     if (loginUser.fulfilled.match(result)) {
+      await dispatch(fetchCart()); // Updated to fetchCart
+      await dispatch(initializeBooks());
+      await dispatch(fetchUserInfo());
       handleClose(); // Close the modal only if login is successful
+
       if (onLoginSuccess) onLoginSuccess(); // Call onLoginSuccess if provided
     }
   };

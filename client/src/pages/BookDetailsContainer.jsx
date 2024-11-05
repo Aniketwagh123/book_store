@@ -28,7 +28,12 @@ const BookDetailsContainer = () => {
   const books = useSelector((state) => state.books.items);
   const book = books.find((book) => book.id === parseInt(id, 10));
 
-  const cartItems = useSelector((state) => state.cart.items);
+  const cartItems = useSelector((state) =>
+    state.cart.items.map((item) => ({
+      ...item,
+      book: parseInt(item.book, 10),
+    }))
+  );
   const cartItem = cartItems.find((item) => item.book === parseInt(id, 10));
 
   if (loading) {
@@ -55,7 +60,7 @@ const BookDetailsContainer = () => {
     }
   };
 
-  const handleIncrement = () => {
+  const handleIncrement = () => {    
     if (cartItem) {
       console.log('cartItem');
       console.log(cartItem);
@@ -86,6 +91,7 @@ const BookDetailsContainer = () => {
 
   return (
     <Container>
+      {JSON.stringify(cartItems)}
       <Grid container spacing={4} sx={{ marginTop: "2rem" }}>
         <Grid item xs={12} md={4}>
           <div
